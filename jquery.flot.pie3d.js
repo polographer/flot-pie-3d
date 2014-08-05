@@ -13,6 +13,8 @@ percentages internally.
 
 * Updated with contributions from btburnett3, Anthony Aragues and Xavi Ivars
 
+* Buggy and dirty 3d code by Marco Ornelas
+
 The plugin supports these options:
 
 	series: {
@@ -22,6 +24,7 @@ The plugin supports these options:
 			innerRadius: 0-1 for percentage of fullsize or a specified pixel length, for creating a donut effect
 			startAngle: 0-2 factor of PI used for starting angle (in radians) i.e 3/2 starts at the top, 0 and 2 have the same result
 			tilt: 0-1 for percentage to tilt the pie, where 1 is no tilt, and 0 is completely flat (nothing will show)
+      depth: 3d depth
 			offset: {
 				top: integer value to move the pie up or down
 				left: integer value to move the pie left or right, or 'auto'
