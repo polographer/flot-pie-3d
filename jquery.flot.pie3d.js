@@ -471,7 +471,8 @@ More detail and specific examples can be found in the included HTML file.
         }
 
         function ColorLuminance(hex, lum) {
-
+          // borrowed from, great article btw:
+          // http://www.sitepoint.com/javascript-generate-lighter-darker-color/
           // validate hex string
           hex = String(hex).replace(/[^0-9a-f]/gi, '');
           if (hex.length < 6) {
