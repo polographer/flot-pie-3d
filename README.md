@@ -11,16 +11,16 @@ Consider this a pre-beta-alpha that don't do a lot of error checking
 
 this are the options:
 
->series: {
->  pie3d: {
->   show: true ,
->      tilt: 0.9,
->      radius: 0.90,
->      depth: 20,
->      stroke: {
->        width: 0
->      }
->  }
->}
+>series: {  
+>  pie3d: {  
+>   show: true ,  
+>      tilt: 0.9,  
+>      radius: 0.90,  
+>      depth: 20,  
+>      stroke: {  
+>        width: 0  
+>      }  
+>  }  
+>}  
 
 will commit an fix as my time permits feel free to fork it, I've release it under the MIT license
