@@ -1,6 +1,6 @@
 flot-pie-3d
 ===========
-![alt tag](https://www.dropbox.com/s/an3cbwcbxzeaqkm/3dpie.jpg)  
+![alt tag](https://s3.amazonaws.com/zerokernel-shared-files/3dpie.jpg)  
 My boss really liked the 3d on a pie, so I modify the pie plugin from flot to create the 3d effect.
 
 Right now is made by creating multiple passes of the original pie from bottom to top, so that will create the effect (sounds more like a hack but it works perfectly). 
