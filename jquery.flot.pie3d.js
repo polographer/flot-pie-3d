@@ -1,4 +1,4 @@
-/* Flot plugin for rendering 3d pie charts.
+/* Flot plugin for rendering pie charts.
 
 Copyright (c) 2007-2014 IOLA and Ole Laursen.
 Licensed under the MIT license.
@@ -13,8 +13,6 @@ percentages internally.
 
 * Updated with contributions from btburnett3, Anthony Aragues and Xavi Ivars
 
-* Buggy and dirty 3d code by Marco Ornelas
-
 The plugin supports these options:
 
 	series: {
@@ -24,7 +22,6 @@ The plugin supports these options:
 			innerRadius: 0-1 for percentage of fullsize or a specified pixel length, for creating a donut effect
 			startAngle: 0-2 factor of PI used for starting angle (in radians) i.e 3/2 starts at the top, 0 and 2 have the same result
 			tilt: 0-1 for percentage to tilt the pie, where 1 is no tilt, and 0 is completely flat (nothing will show)
-      depth: 3d depth
 			offset: {
 				top: integer value to move the pie up or down
 				left: integer value to move the pie left or right, or 'auto'
@@ -86,43 +83,43 @@ More detail and specific examples can be found in the included HTML file.
 		// add hook to determine if pie plugin in enabled, and then perform necessary operations
 
 		plot.hooks.processOptions.push(function(plot, options) {
-			if (options.series.pie.show) {
+			if (options.series.pie3d.show) {
 
 				options.grid.show = false;
 
 				// set labels.show
 
-				if (options.series.pie.label.show == "auto") {
+				if (options.series.pie3d.label.show == "auto") {
 					if (options.legend.show) {
-						options.series.pie.label.show = false;
+						options.series.pie3d.label.show = false;
 					} else {
-						options.series.pie.label.show = true;
+						options.series.pie3d.label.show = true;
 					}
 				}
 
 				// set radius
 
-				if (options.series.pie.radius == "auto") {
-					if (options.series.pie.label.show) {
-						options.series.pie.radius = 3/4;
+				if (options.series.pie3d.radius == "auto") {
+					if (options.series.pie3d.label.show) {
+						options.series.pie3d.radius = 3/4;
 					} else {
-						options.series.pie.radius = 1;
+						options.series.pie3d.radius = 1;
 					}
 				}
 
 				// ensure sane tilt
 
-				if (options.series.pie.tilt > 1) {
-					options.series.pie.tilt = 1;
-				} else if (options.series.pie.tilt < 0) {
-					options.series.pie.tilt = 0;
+				if (options.series.pie3d.tilt > 1) {
+					options.series.pie3d.tilt = 1;
+				} else if (options.series.pie3d.tilt < 0) {
+					options.series.pie3d.tilt = 0;
 				}
 			}
 		});
 
 		plot.hooks.bindEvents.push(function(plot, eventHolder) {
 			var options = plot.getOptions();
-			if (options.series.pie.show) {
+			if (options.series.pie3d.show) {
 				if (options.grid.hoverable) {
 					eventHolder.unbind("mousemove").mousemove(onMouseMove);
 				}
@@ -134,21 +131,21 @@ More detail and specific examples can be found in the included HTML file.
 
 		plot.hooks.processDatapoints.push(function(plot, series, data, datapoints) {
 			var options = plot.getOptions();
-			if (options.series.pie.show) {
+			if (options.series.pie3d.show) {
 				processDatapoints(plot, series, data, datapoints);
 			}
 		});
 
 		plot.hooks.drawOverlay.push(function(plot, octx) {
 			var options = plot.getOptions();
-			if (options.series.pie.show) {
+			if (options.series.pie3d.show) {
 				drawOverlay(plot, octx);
 			}
 		});
 
 		plot.hooks.draw.push(function(plot, newCtx) {
 			var options = plot.getOptions();
-			if (options.series.pie.show) {
+			if (options.series.pie3d.show) {
 				draw(plot, newCtx);
 			}
 		});
@@ -168,7 +165,7 @@ More detail and specific examples can be found in the included HTML file.
 			var total = 0,
 				combined = 0,
 				numCombined = 0,
-				color = options.series.pie.combine.color,
+				color = options.series.pie3d.combine.color,
 				newdata = [];
 
 			// Fix up the raw data from Flot, ensuring the data is numeric
@@ -215,7 +212,7 @@ More detail and specific examples can be found in the included HTML file.
 
 			for (var i = 0; i < data.length; ++i) {
 				var value = data[i].data[0][1];
-				if (value / total <= options.series.pie.combine.threshold) {
+				if (value / total <= options.series.pie3d.combine.threshold) {
 					combined += value;
 					numCombined++;
 					if (!color) {
@@ -226,7 +223,7 @@ More detail and specific examples can be found in the included HTML file.
 
 			for (var i = 0; i < data.length; ++i) {
 				var value = data[i].data[0][1];
-				if (numCombined < 2 || value / total > options.series.pie.combine.threshold) {
+				if (numCombined < 2 || value / total > options.series.pie3d.combine.threshold) {
 					newdata.push(
 						$.extend(data[i], {     /* extend to allow keeping all other original data values
 						                           and using them e.g. in labelFormatter. */
@@ -244,7 +241,7 @@ More detail and specific examples can be found in the included HTML file.
 				newdata.push({
 					data: [[1, combined]],
 					color: color,
-					label: options.series.pie.combine.label,
+					label: options.series.pie3d.combine.label,
 					angle: combined * Math.PI * 2 / total,
 					percent: combined / (total / 100)
 				});
@@ -290,11 +287,11 @@ More detail and specific examples can be found in the included HTML file.
 
 			// calculate maximum radius and center point
 
-			maxRadius =  Math.min(canvasWidth, canvasHeight / options.series.pie.tilt) / 2;
-			centerTop = canvasHeight / 2 + options.series.pie.offset.top;
+			maxRadius =  Math.min(canvasWidth, canvasHeight / options.series.pie3d.tilt) / 2;
+			centerTop = canvasHeight / 2 + options.series.pie3d.offset.top;
 			centerLeft = canvasWidth / 2;
 
-			if (options.series.pie.offset.left == "auto") {
+			if (options.series.pie3d.offset.left == "auto") {
 				if (options.legend.position.match("w")) {
 					centerLeft += legendWidth / 2;
 				} else {
@@ -306,7 +303,7 @@ More detail and specific examples can be found in the included HTML file.
 					centerLeft = canvasWidth - maxRadius;
 				}
 			} else {
-				centerLeft += options.series.pie.offset.left;
+				centerLeft += options.series.pie3d.offset.left;
 			}
 
 			var slices = plot.getData(),
@@ -321,7 +318,7 @@ More detail and specific examples can be found in the included HTML file.
 				}
 				attempts += 1;
 				clear();
-				if (options.series.pie.tilt <= 0.8) {
+				if (options.series.pie3d.tilt <= 0.8) {
 					//drawShadow();
 				}
 			} while (!drawPie() && attempts < REDRAW_ATTEMPTS)
@@ -343,15 +340,16 @@ More detail and specific examples can be found in the included HTML file.
 				target.children().filter(".pieLabel, .pieLabelBackground").remove();
 			}
 
+      /*
 			function drawShadow() {
 
-				var shadowLeft = options.series.pie.shadow.left;
-				var shadowTop = options.series.pie.shadow.top;
+				var shadowLeft = options.series.pie3d.shadow.left;
+				var shadowTop = options.series.pie3d.shadow.top;
 				var edge = 10;
-				var alpha = options.series.pie.shadow.alpha;
-				var radius = options.series.pie.radius > 1 ? options.series.pie.radius : maxRadius * options.series.pie.radius;
+				var alpha = options.series.pie3d.shadow.alpha;
+				var radius = options.series.pie3d.radius > 1 ? options.series.pie3d.radius : maxRadius * options.series.pie3d.radius;
 
-				if (radius >= canvasWidth / 2 - shadowLeft || radius * options.series.pie.tilt >= canvasHeight / 2 - shadowTop || radius <= edge) {
+				if (radius >= canvasWidth / 2 - shadowLeft || radius * options.series.pie3d.tilt >= canvasHeight / 2 - shadowTop || radius <= edge) {
 					return;	// shadow would be outside canvas, so don't draw it
 				}
 
@@ -363,7 +361,7 @@ More detail and specific examples can be found in the included HTML file.
 				// center and rotate to starting position
 
 				ctx.translate(centerLeft,centerTop);
-				ctx.scale(1, options.series.pie.tilt);
+				ctx.scale(1, options.series.pie3d.tilt);
 
 				//radius -= edge;
 
@@ -376,25 +374,26 @@ More detail and specific examples can be found in the included HTML file.
 
 				ctx.restore();
 			}
+      */
 
 			function drawPie() {
 
-				var startAngle = Math.PI * options.series.pie.startAngle;
-				var radius = options.series.pie.radius > 1 ? options.series.pie.radius : maxRadius * options.series.pie.radius;
+				var startAngle = Math.PI * options.series.pie3d.startAngle;
+				var radius = options.series.pie3d.radius > 1 ? options.series.pie3d.radius : maxRadius * options.series.pie3d.radius;
 
 				// center and rotate to starting position
 
 				ctx.save();
 				ctx.translate(centerLeft,centerTop);
-				ctx.scale(1, options.series.pie.tilt);
+				ctx.scale(1, options.series.pie3d.tilt);
 				//ctx.rotate(startAngle); // start at top; -- This doesn't work properly in Opera
 
 				// draw slices
 
 				ctx.save();
 
-        if (options.series.pie.tilt < 1){
-          var depth = options.series.pie.depth ;
+        if (options.series.pie3d.tilt < 1){
+          var depth = options.series.pie3d.depth ;
           for (var j=depth ; j> 0 ; j--){
             var currentAngle = startAngle;
             for (var i = 0; i < slices.length; ++i) {
@@ -416,12 +415,12 @@ More detail and specific examples can be found in the included HTML file.
 
       // draw slice outlines
 
-      if (options.series.pie.stroke.width > 0) {
+      if (options.series.pie3d.stroke.width > 0) {
         ctx.save();
-        ctx.lineWidth = options.series.pie.stroke.width;
+        ctx.lineWidth = options.series.pie3d.stroke.width;
         currentAngle = startAngle;
         for (var i = 0; i < slices.length; ++i) {
-          drawSlice(slices[i].angle, options.series.pie.stroke.color, false);
+          drawSlice(slices[i].angle, options.series.pie3d.stroke.color, false);
         }
         ctx.restore();
       }
@@ -434,7 +433,7 @@ More detail and specific examples can be found in the included HTML file.
 
       // Draw the labels, returning true if they fit within the plot
 
-      if (options.series.pie.label.show) {
+      if (options.series.pie3d.label.show) {
         return drawLabels();
       } else return true;
 
@@ -471,8 +470,7 @@ More detail and specific examples can be found in the included HTML file.
         }
 
         function ColorLuminance(hex, lum) {
-          // borrowed from, great article btw:
-          // http://www.sitepoint.com/javascript-generate-lighter-darker-color/
+
           // validate hex string
           hex = String(hex).replace(/[^0-9a-f]/gi, '');
           if (hex.length < 6) {
@@ -526,10 +524,10 @@ More detail and specific examples can be found in the included HTML file.
         function drawLabels() {
 
           var currentAngle = startAngle;
-          var radius = options.series.pie.label.radius > 1 ? options.series.pie.label.radius : maxRadius * options.series.pie.label.radius;
+          var radius = options.series.pie3d.label.radius > 1 ? options.series.pie3d.label.radius : maxRadius * options.series.pie3d.label.radius;
 
           for (var i = 0; i < slices.length; ++i) {
-            if (slices[i].percent >= options.series.pie.label.threshold * 100) {
+            if (slices[i].percent >= options.series.pie3d.label.threshold * 100) {
               if (!drawLabel(slices[i], currentAngle, i)) {
                 return false;
               }
@@ -547,7 +545,7 @@ More detail and specific examples can be found in the included HTML file.
 
 						// format label text
 
-						var lf = options.legend.labelFormatter, text, plf = options.series.pie.label.formatter;
+						var lf = options.legend.labelFormatter, text, plf = options.series.pie3d.label.formatter;
 
 						if (lf) {
 							text = lf(slice.label, slice);
@@ -560,8 +558,8 @@ More detail and specific examples can be found in the included HTML file.
 						}
 
 						var halfAngle = ((startAngle + slice.angle) + startAngle) / 2;
-						var x = centerLeft + Math.round(Math.cos(halfAngle) * radius  );
-						var y = centerTop + Math.round(Math.sin(halfAngle) * radius ) * options.series.pie.tilt;
+						var x = centerLeft + Math.round(Math.cos(halfAngle) * radius );
+						var y = centerTop + Math.round(Math.sin(halfAngle) * radius ) * options.series.pie3d.tilt;
 
 						var html = "<span class='pieLabel' id='pieLabel" + index + "' style='position:absolute;top:" + y + "px;left:" + x + "px;'>" + text + "</span>";
 						target.append(html);
@@ -579,11 +577,11 @@ More detail and specific examples can be found in the included HTML file.
 							return false;
 						}
 
-						if (options.series.pie.label.background.opacity != 0) {
+						if (options.series.pie3d.label.background.opacity != 0) {
 
 							// put in the transparent background separately to avoid blended labels and label boxes
 
-							var c = options.series.pie.label.background.color;
+							var c = options.series.pie3d.label.background.color;
 
 							if (c == null) {
 								c = slice.color;
@@ -591,7 +589,7 @@ More detail and specific examples can be found in the included HTML file.
 
 							var pos = "top:" + labelTop + "px;left:" + labelLeft + "px;";
 							$("<div class='pieLabelBackground' style='position:absolute;width:" + label.width() + "px;height:" + label.height() + "px;" + pos + "background-color:" + c + ";'></div>")
-								.css("opacity", options.series.pie.label.background.opacity)
+								.css("opacity", options.series.pie3d.label.background.opacity)
 								.insertBefore(label);
 						}
 
@@ -604,15 +602,15 @@ More detail and specific examples can be found in the included HTML file.
 		// Placed here because it needs to be accessed from multiple locations
 
 		function drawDonutHole(layer) {
-			if (options.series.pie.innerRadius > 0) {
+			if (options.series.pie3d.innerRadius > 0) {
 
 				// subtract the center
 
 				layer.save();
-				var innerRadius = options.series.pie.innerRadius > 1 ? options.series.pie.innerRadius : maxRadius * options.series.pie.innerRadius;
+				var innerRadius = options.series.pie3d.innerRadius > 1 ? options.series.pie3d.innerRadius : maxRadius * options.series.pie3d.innerRadius;
 				layer.globalCompositeOperation = "destination-out"; // this does not work with excanvas, but it will fall back to using the stroke color
 				layer.beginPath();
-				layer.fillStyle = options.series.pie.stroke.color;
+				layer.fillStyle = options.series.pie3d.stroke.color;
 				layer.arc(0, 0, innerRadius, 0, Math.PI * 2, false);
 				layer.fill();
 				layer.closePath();
@@ -622,7 +620,7 @@ More detail and specific examples can be found in the included HTML file.
 
 				layer.save();
 				layer.beginPath();
-				layer.strokeStyle = options.series.pie.stroke.color;
+				layer.strokeStyle = options.series.pie3d.stroke.color;
 				layer.arc(0, 0, innerRadius, 0, Math.PI * 2, false);
 				layer.stroke();
 				layer.closePath();
@@ -646,19 +644,19 @@ More detail and specific examples can be found in the included HTML file.
 
 			var slices = plot.getData(),
 				options = plot.getOptions(),
-				radius = options.series.pie.radius > 1 ? options.series.pie.radius : maxRadius * options.series.pie.radius,
+				radius = options.series.pie3d.radius > 1 ? options.series.pie3d.radius : maxRadius * options.series.pie3d.radius,
 				x, y;
 
 			for (var i = 0; i < slices.length; ++i) {
 
 				var s = slices[i];
 
-				if (s.pie.show) {
+				if (s.pie3d.show) {
 
 					ctx.save();
 					ctx.beginPath();
 					ctx.moveTo(0, 0); // Center of the pie
-					//ctx.scale(1, options.series.pie.tilt);	// this actually seems to break everything when here.
+					//ctx.scale(1, options.series.pie3d.tilt);	// this actually seems to break everything when here.
 					ctx.arc(0, 0, radius, s.startAngle, s.startAngle + s.angle / 2, false);
 					ctx.arc(0, 0, radius, s.startAngle + s.angle / 2, s.startAngle + s.angle, false);
 					ctx.closePath();
@@ -799,11 +797,11 @@ More detail and specific examples can be found in the included HTML file.
 
 			var options = plot.getOptions();
 
-			var radius = options.series.pie.radius > 1 ? options.series.pie.radius : maxRadius * options.series.pie.radius;
+			var radius = options.series.pie3d.radius > 1 ? options.series.pie3d.radius : maxRadius * options.series.pie3d.radius;
 
 			octx.save();
 			octx.translate(centerLeft, centerTop);
-			octx.scale(1, options.series.pie.tilt);
+			octx.scale(1, options.series.pie3d.tilt);
 
 			for (var i = 0; i < highlights.length; ++i) {
 				drawHighlight(highlights[i].series);
@@ -819,8 +817,8 @@ More detail and specific examples can be found in the included HTML file.
 					return;
 				}
 
-				//octx.fillStyle = parseColor(options.series.pie.highlight.color).scale(null, null, null, options.series.pie.highlight.opacity).toString();
-				octx.fillStyle = "rgba(255, 255, 255, " + options.series.pie.highlight.opacity + ")"; // this is temporary until we have access to parseColor
+				//octx.fillStyle = parseColor(options.series.pie3d.highlight.color).scale(null, null, null, options.series.pie.highlight.opacity).toString();
+				octx.fillStyle = "rgba(255, 255, 255, " + options.series.pie3d.highlight.opacity + ")"; // this is temporary until we have access to parseColor
 				octx.beginPath();
 				if (Math.abs(series.angle - Math.PI * 2) > 0.000000001) {
 					octx.moveTo(0, 0); // Center of the pie
@@ -837,13 +835,14 @@ More detail and specific examples can be found in the included HTML file.
 
 	var options = {
 		series: {
-			pie: {
+			pie3d: {
 				show: false,
 				radius: "auto",	// actual radius of the visible pie (based on full calculated radius if <=1, or hard pixel value)
 				innerRadius: 0, /* for donut */
 				startAngle: 3/2,
-				tilt: 1,
-				shadow: {
+				tilt: 0.5 ,
+        depth: 10,
+        shadow: {
 					left: 5,	// shadow left offset
 					top: 15,	// shadow top offset
 					alpha: 0.02	// shadow alpha
@@ -884,8 +883,8 @@ More detail and specific examples can be found in the included HTML file.
 	$.plot.plugins.push({
 		init: init,
 		options: options,
-		name: "pie",
-		version: "1.1"
+		name: "pie3d",
+		version: "0.1"
 	});
 
 })(jQuery);
